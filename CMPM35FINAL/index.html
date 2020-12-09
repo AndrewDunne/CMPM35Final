@@ -43,6 +43,28 @@
 	cube.receiveShadow = true;
 	scene.add(cube);
 	
+	//diorama base - lower piece
+	const geometry2 = new THREE.SphereGeometry(3, 32, 32, 0, 2*Math.PI, 1.75, Math.PI/2);
+    const material2 = new THREE.MeshPhongMaterial();
+    const sphere = new THREE.Mesh(geometry2, material2);
+    sphere.position.x = 0; 
+    sphere.position.y = 0;
+    scene.add(sphere);
+
+	//diorama base - upper piece
+    const geometry3 = new THREE.SphereGeometry(8.5, 32, 32, 0, 2*Math.PI, 0, Math.PI/9) 
+    const material3 = new THREE.MeshPhongMaterial();
+    const sphere2 = new THREE.Mesh(geometry3, material3);
+    sphere2.position.x = 0; 
+    sphere2.position.y = -8.5; //the larger the shape, the higher it goes, it helps to have the size and negative ypos be the same
+    scene.add(sphere2);
+
+
+
+
+
+
+
 	const light1 = new THREE.PointLight(0xffffff);
 	light1.position.set(0,0,2);
 	scene.add(light1);
@@ -143,7 +165,10 @@ mtloader.load('./CMPM35Water.mtl', function(materials){
 		function ( object ) {
 			object.traverse(function(child){child.castShadow = true;});
 			object.traverse(function(child){child.receiveShadow = true;});
+			object.position.set(0,-3.3,0);
+			object.scale.set(3,3,3);
 			scene.add( object );
+			
 
 		},
 		// called when loading is in progresses
