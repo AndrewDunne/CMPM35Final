@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>shapes</title>
+		<title>Diorama</title>
 	</head>
 	<body>
     
@@ -16,48 +16,63 @@
 	
  
     const scene = new THREE.Scene();
+	scene.background = new THREE.Color(0x888888);
+	scene.fog = new THREE.Fog(0x888888, 0, 5);
+	
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    //we are going to place our 3D meshes at the center of the world's coordinate system, 
-    //  so we move the camera so that it can see them 
-    camera.position.z = 5;
-	camera.position.y = 5;
+    camera.position.z = 3;
 
     const renderer = new THREE.WebGLRenderer();
 	renderer.shadowMapEnabled = true;
-	
-	let moveForward = false, moveRight = false, moveBackward = false, moveLeft = false, moveUp = false, moveDown = false;
-	let moveSpeed = 1;
-	let prevTime = performance.now();
-	const velocity = new THREE.Vector3();
-	const direction = new THREE.Vector3();
 
     //make the canvas take up the entire browser window
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
+	// Orbit controls
     const controls = new OrbitControls(camera, renderer.domElement);
+	controls.maxPolarAngle = Math.PI/2;
 	
+	// Secret lab 
 	const geometry = new THREE.BoxGeometry(1,1,1);
-	const material1 = new THREE.MeshPhongMaterial();
-	const cube = new THREE.Mesh(geometry, material1);
-	cube.receiveShadow = true;
-	scene.add(cube);
+	const material1 = new THREE.MeshPhongMaterial({color: 0x666666});
+	const lab = new THREE.Mesh(geometry, material1);
+	lab.position.set(0,0,0); 
+	lab.receiveShadow = true;
+	lab.castShadow = true;
+	scene.add(lab);
+	
+	// Window 1
+	const windowGeometry = new THREE.BoxGeometry(.2,.2,.05);
+	const windowMaterial = new THREE.MeshPhongMaterial({emissive: 0xffff00, opacity: 0.1, transparent: true,});
+	const labWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+	labWindow.position.set(0.2,.2,.5); 
+	scene.add(labWindow);
+	
+	// Window 2
+	const labWindow2 = new THREE.Mesh(windowGeometry, windowMaterial);
+	labWindow2.position.set(-0.2,.2,.5); 
+	scene.add(labWindow2);
 	
 	//diorama base - lower piece
 	const geometry2 = new THREE.SphereGeometry(3, 32, 32, 0, 2*Math.PI, 1.75, Math.PI/2);
-    const material2 = new THREE.MeshPhongMaterial();
-    const sphere = new THREE.Mesh(geometry2, material2);
-    sphere.position.x = 0; 
-    sphere.position.y = 0;
-    scene.add(sphere);
+    const material2 = new THREE.MeshPhongMaterial({color: 0x553322});
+    const dioBase = new THREE.Mesh(geometry2, material2);
+    dioBase.position.x = 0; 
+    dioBase.position.y = 0;
+	dioBase.receiveShadow = true;
+	dioBase.castShadow = true;
+    scene.add(dioBase);
 
 	//diorama base - upper piece
     const geometry3 = new THREE.SphereGeometry(8.5, 32, 32, 0, 2*Math.PI, 0, Math.PI/9) 
-    const material3 = new THREE.MeshPhongMaterial();
-    const sphere2 = new THREE.Mesh(geometry3, material3);
-    sphere2.position.x = 0; 
-    sphere2.position.y = -8.5; //the larger the shape, the higher it goes, it helps to have the size and negative ypos be the same
-    scene.add(sphere2);
+    const material3 = new THREE.MeshPhongMaterial({color: 0xddddff});
+    const dioGround = new THREE.Mesh(geometry3, material3);
+    dioGround.position.x = 0; 
+    dioGround.position.y = -8.58; //the larger the shape, the higher it goes, it helps to have the size and negative ypos be the same
+	dioGround.receiveShadow = true;
+	dioGround.castShadow = true;
+    scene.add(dioGround);
 
 
 
@@ -65,13 +80,14 @@
 
 
 
-	const light1 = new THREE.PointLight(0xffffff);
+	/*const light1 = new THREE.PointLight(0xffffff);
 	light1.position.set(0,0,2);
 	scene.add(light1);
 	
 	const hemiLight = new THREE.HemisphereLight(0xffffff, 0xaaaaaa);
-	scene.add( hemiLight );
+	scene.add( hemiLight );*/
 	
+	// Sun light, with cast shadows
 	let sun1 = new THREE.DirectionalLight(0xdfebff, 1.75);
     sun1.position.set(-5, 5, 5);
     sun1.position.multiplyScalar(1.3);
@@ -95,49 +111,7 @@
 	
 	let shadowCam = new THREE.CameraHelper( sun1.shadow.camera );
 	scene.add(shadowCam);
-	
-	// HDRI
-	/*
-	const genCubeUrls = function ( prefix, postfix ) {
-
-					return [
-						prefix + 'px' + postfix, prefix + 'nx' + postfix,
-						prefix + 'py' + postfix, prefix + 'ny' + postfix,
-						prefix + 'pz' + postfix, prefix + 'nz' + postfix
-					];
-
-				};
-
-				const urls = genCubeUrls( './textures/montana-northern-plains', '.jpg' );
-
-				new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
-
-					cubeTexture.encoding = THREE.sRGBEncoding;
-
-					scene.background = cubeTexture;
-
-					lightProbe.copy( LightProbeGenerator.fromCubeTexture( cubeTexture ) );
-
-					const geometry = new THREE.SphereBufferGeometry( 5, 64, 32 );
-					//const geometry = new TorusKnotBufferGeometry( 4, 1.5, 256, 32, 2, 3 );
-
-					const material = new THREE.MeshStandardMaterial( {
-						color: 0xffffff,
-						metalness: 0,
-						roughness: 0,
-						envMap: cubeTexture,
-						envMapIntensity: API.envMapIntensity,
-					} );
-
-					// mesh
-					mesh = new THREE.Mesh( geometry, material );
-					scene.add( mesh );
-
-					render();
-
-				} );
-	
-	*/
+	// End sun light
 	
 	
 	
@@ -166,6 +140,7 @@ mtloader.load('./CMPM35Water.mtl', function(materials){
 			object.traverse(function(child){child.castShadow = true;});
 			object.traverse(function(child){child.receiveShadow = true;});
 			object.position.set(0,-3.3,0);
+			object.rotation.set(0,3.1415/2,0);
 			object.scale.set(3,3,3);
 			scene.add( object );
 			
