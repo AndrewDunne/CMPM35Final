@@ -272,20 +272,24 @@ function onKeyDown(event){
 };
 
 //rocket launch
+
+let rocketLaunch = false;
+
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
     var keyCode = event.which;
     if (keyCode == 76) 
 	{
-		cylinder.position.y +=.5;
-		cone.position.y +=.5;
-		console.log("launch");
-		
+	rocketLaunch = true;	
 	}
 }
 const animate = function () {
   requestAnimationFrame(animate);
-  //move();
+  if(rocketLaunch == true)
+  {
+	  cylinder.position.y +=.5;
+	  cone.position.y +=.5;
+  }
   renderer.render(scene, camera);
 };
 
