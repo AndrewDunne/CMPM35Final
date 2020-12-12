@@ -203,43 +203,50 @@ mtloader.load('./CMPM35Water.mtl', function(materials){
 
 });
 
-	// When you click, the lights turn on/off
-	document.addEventListener("click", onClick, false);
-	function onClick(event){
+function dayNight(){ // Function that switches from day to night and vice versa
 	
-		if(windowMaterial.opacity < .5){ // From day to night
-			windowMaterial.opacity = .5;
-			windowLight1.intensity = 1;
-			windowLight2.intensity = 1;
-			sun1.intensity = 0;
-			hemiLight.color.set(0x111111);
-			scene.background.set(0x000000);
-			scene.fog = nightFog;
-		}
-		else{ // From night to day
-			windowMaterial.opacity = .1;
-			windowLight1.intensity = .2;
-			windowLight2.intensity = .2;
-			sun1.intensity = 1;
-			hemiLight.color.set(0x888888);
-			scene.background.set(0x888888);
-			scene.fog = dayFog;
-		}
-	
+	if(windowMaterial.opacity < .5){ // From day to night
+		windowMaterial.opacity = .5
+		windowLight1.intensity = 1
+		windowLight2.intensity = 1
+		sun1.intensity = 0
+		hemiLight.color.set(0x111111);
+		scene.background.set(0x000000);
+		scene.fog = nightFog;
+	}
+	else{ // From night to day
+		windowMaterial.opacity = .1
+		windowLight1.intensity = .2
+		windowLight2.intensity = .2
+		sun1.intensity = 1
+		hemiLight.color.set(0x888888);
+		scene.background.set(0x888888);
+		scene.fog = dayFog
 	};
 
-    const animate = function () {
-      requestAnimationFrame(animate);
-	  
-      renderer.render(scene, camera);
-    };
+}
 
-    animate();
+document.addEventListener("keydown", onKeyDown, false);
+function onKeyDown(event){
+	switch (event.keyCode) {
 
-    function rotateObject(o, dx, dy) {
-      o.rotation.x += dx;
-      o.rotation.y += dy;
-    }
+		case 68: /* d */ dayNight(); break; // Pressing 'd' switches between day and night
+	}
+
+};
+
+const animate = function () {
+  requestAnimationFrame(animate);
+  
+  renderer.render(scene, camera);
+};
+
+animate();
+
+function rotateObject(o, dx, dy) {
+  o.rotation.x += dx;
+  o.rotation.y += dy;
+}
 
   </script>
   </body>
