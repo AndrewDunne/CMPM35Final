@@ -81,6 +81,32 @@
 	pad.castShadow = true;
 	scene.add(pad);
 
+	//big H
+	const hGeo1 = new THREE.BoxGeometry(.7,1,.05);
+	const hMat1 = new THREE.MeshPhongMaterial({color: 0xfcdb03});
+	const hMark1 = new THREE.Mesh(hGeo1, hMat1);
+	hMark1.position.set(0,-.54,1.55); 
+	hMark1.receiveShadow = true;
+	hMark1.castShadow = true;
+	scene.add(hMark1);
+
+	const hGeo2 = new THREE.BoxGeometry(.7,1,.05);
+	const hMat2 = new THREE.MeshPhongMaterial({color: 0xfcdb03});
+	const hMark2 = new THREE.Mesh(hGeo2, hMat2);
+	hMark2.position.set(0,-.54,1); 
+	hMark2.receiveShadow = true;
+	hMark2.castShadow = true;
+	scene.add(hMark2);
+
+	const hGeo3 = new THREE.BoxGeometry(.05,1,.7);
+	const hMat3 = new THREE.MeshPhongMaterial({color: 0xfcdb03});
+	const hMark3 = new THREE.Mesh(hGeo3, hMat3);
+	hMark3.position.set(0,-.54,1.27); 
+	hMark3.receiveShadow = true;
+	hMark3.castShadow = true;
+	scene.add(hMark3);
+
+
 	//silo
 	const sGeometry = new THREE.CylinderGeometry(.3, .4, 3, 6);
 	const sMat = new THREE.MeshPhongMaterial( {color: 0x666666} );
@@ -89,6 +115,15 @@
 	cylinder.receiveShadow = true;
 	cylinder.castShadow = true;
 	scene.add(cylinder);
+
+	//silo top
+	const coneGeometry = new THREE.ConeGeometry( .35, .5, 6 );
+	const coneMat = new THREE.MeshBasicMaterial( {color: 0x666666} );
+	const cone = new THREE.Mesh( coneGeometry, coneMat );
+	cone.position.set(-.9, 1.7, -.1);
+	cone.receiveShadow = true;
+	cone.castShadow = true;
+	scene.add( cone );
 
 	//diorama base - lower piece
 	const geometry2 = new THREE.SphereGeometry(3, 32, 32, 0, 2*Math.PI, 1.75, Math.PI/2);
@@ -113,7 +148,10 @@
 
 
 
-
+	// Rocket Light
+	let rocketLight = new THREE.PointLight(0xff8800,0.0,20,2);
+	rocketLight.position.set(-.9,-2.6,-.1);
+	scene.add(rocketLight);
 
 	// Light from the lab
 	let windowLight1 = new THREE.PointLight(0xffffbb,0.1);
@@ -123,10 +161,11 @@
 	let windowLight2 = new THREE.PointLight(0xffffbb,0.1);
 	windowLight2.position.set(0.7,0.2,0.4);
 	scene.add(windowLight2);
-	
+
 	// Ambient light: The shadows are this bright
 	const hemiLight = new THREE.AmbientLight(0x888888);
 	scene.add( hemiLight );
+
 	
 	// Sun light, with cast shadows
 	let sun1 = new THREE.DirectionalLight(0xdfebff, 1.0);
@@ -184,20 +223,20 @@ mtloader.load('./CMPM35Water.mtl', function(materials){
 			object.rotation.set(0,3.1415/2,0);
 			object.scale.set(3,3,3);
 			scene.add( object );
-			
-
-		},
-		// called when loading is in progresses
-		function ( xhr ) {
-
-			console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+		}
+	);
 	
-		},
-		// called when loading has errors
-		function ( error ) {
-
-			console.log( 'An error happened' );
-
+	loader.load(
+		// resource URL
+		'./CMPM35Water.obj',
+		// called when resource is loaded
+		function ( object ) {
+			object.traverse(function(child){child.castShadow = true;});
+			object.traverse(function(child){child.receiveShadow = true;});
+			object.position.set(0,-3.3,0);
+			object.rotation.set(0,-3.1415/2,0);
+			object.scale.set(3,3,3);
+			scene.add( object );
 		}
 	);
 
@@ -235,9 +274,27 @@ function onKeyDown(event){
 
 };
 
+//rocket launch
+
+let rocketLaunch = false;
+
+document.addEventListener("keydown", onDocumentKeyDown, false);
+function onDocumentKeyDown(event) {
+    var keyCode = event.which;
+    if (keyCode == 76) 
+	{
+		rocketLaunch = true;
+		rocketLight.intensity = 3;
+	}
+}
 const animate = function () {
   requestAnimationFrame(animate);
-  
+  if(rocketLaunch == true)
+  {
+	  cylinder.position.y +=.1;
+	  cone.position.y +=.1;
+	  rocketLight.position.y +=.1;
+  }
   renderer.render(scene, camera);
 };
 
