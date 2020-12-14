@@ -38,7 +38,7 @@
 	
 	// Secret lab 
 	const geometry = new THREE.BoxGeometry(1,1,1);
-	const material1 = new THREE.MeshPhongMaterial({color: 0x666666});
+	const material1 = new THREE.MeshPhongMaterial({color: 0x444444});
 	const lab = new THREE.Mesh(geometry, material1);
 	lab.position.set(0,0,0); 
 	lab.receiveShadow = true;
@@ -47,7 +47,7 @@
 
 	//2nd lab
 	const labGeo = new THREE.BoxGeometry(.7,.8,.5);
-	const labMat = new THREE.MeshPhongMaterial({color: 0x666666});
+	const labMat = new THREE.MeshPhongMaterial({color: 0x444444});
 	const lab2 = new THREE.Mesh(labGeo, labMat);
 	lab2.position.set(.8,0,0); 
 	lab2.receiveShadow = true;
@@ -74,7 +74,7 @@
 
 	// Helipad
 	const padGeometry = new THREE.BoxGeometry(1,.3,1);
-	const padMat = new THREE.MeshPhongMaterial({color: 0x666666});
+	const padMat = new THREE.MeshPhongMaterial({color: 0x999999});
 	const pad = new THREE.Mesh(padGeometry, padMat);
 	pad.position.set(0,-.20,1.25); 
 	pad.receiveShadow = true;
@@ -109,7 +109,7 @@
 
 	//silo
 	const sGeometry = new THREE.CylinderGeometry(.3, .4, 3, 6);
-	const sMat = new THREE.MeshPhongMaterial( {color: 0x666666} );
+	const sMat = new THREE.MeshStandardMaterial( {color: 0x666666,roughness:.2,metalness:.2} );
 	const cylinder = new THREE.Mesh( sGeometry, sMat );
 	cylinder.position.set(-.9,0,-.1);
 	cylinder.receiveShadow = true;
@@ -118,7 +118,7 @@
 
 	//silo top
 	const coneGeometry = new THREE.ConeGeometry( .35, .5, 6 );
-	const coneMat = new THREE.MeshPhongMaterial( {color: 0x666666} );
+	const coneMat = new THREE.MeshStandardMaterial( {color: 0x666666,roughness:.2,metalness:.2} );
 	const cone = new THREE.Mesh( coneGeometry, coneMat );
 	cone.position.set(-.9, 1.7, -.1);
 	cone.receiveShadow = true;
@@ -137,13 +137,20 @@
 
 	//diorama base - upper piece
     const geometry3 = new THREE.SphereGeometry(8.5, 32, 32, 0, 2*Math.PI, 0, Math.PI/9) 
-    const material3 = new THREE.MeshPhongMaterial({color: 0xddddff});
+    const material3 = new THREE.MeshStandardMaterial({color: 0x336644,roughness:.8});
     const dioGround = new THREE.Mesh(geometry3, material3);
     dioGround.position.x = 0; 
     dioGround.position.y = -8.58; //the larger the shape, the higher it goes, it helps to have the size and negative ypos be the same
 	dioGround.receiveShadow = true;
 	dioGround.castShadow = true;
     scene.add(dioGround);
+	
+	// drone
+    const droneGeo = new THREE.SphereGeometry(.1);
+	const droneMat = new THREE.MeshStandardMaterial({color: 0x666666,roughness:.3,metalness:1});
+    const drone = new THREE.Mesh(droneGeo, droneMat);
+    drone.position.y = .8;
+    scene.add(drone);
 
 
 
@@ -211,8 +218,6 @@
 
     scene.add(sun1);
 	
-	let shadowCam = new THREE.CameraHelper( sun1.shadow.camera );
-	scene.add(shadowCam);
 	// End sun light
 	
 	
@@ -317,6 +322,10 @@ const animate = function () {
 	  cone.position.y +=.1;
 	  rocketLight.position.y +=.1;
   }
+  
+  drone.position.x = Math.sin(performance.now()/1000)/2;
+  drone.position.z = Math.sin((performance.now()+500*Math.PI)/1000)/2;
+  
   renderer.render(scene, camera);
 };
 
